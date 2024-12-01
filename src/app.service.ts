@@ -1,11 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Jobs } from './module/entity/jobs.entity';
 import { JobsRepository } from './module/repository/jobs.repository';
 import { Students } from './module/entity/students.entity';
 import { StudentsRepository } from './module/repository/students.repository';
-import { SigninRequest } from './module/dto/signin.dto';
+import { SigninRequest, SigninResponse } from './module/dto/signin.dto';
 import { GetJobsResponse } from './module/dto/get_jobs.dto';
+import { JobRequest, PredictRequest } from './module/dto/predict.dto';
 
 @Injectable()
 export class AppService {
@@ -18,26 +19,54 @@ export class AppService {
 
   async signIn(signinReq: SigninRequest) {
     const student = new Students();
-    student.name = signinReq.name;
-    student.nationality = signinReq.nationality;
-    student.email = signinReq.email;
-    student.password = signinReq.password;
-    student.education = signinReq.education;
-    student.major = signinReq.major;
-    student.visa = signinReq.visa;
-    student.topikLevel = signinReq.topikLevel;
-    student.tags = signinReq.tags;
-    return await this.studentsRepository.save(student);
+    student.name = signinReq.userData.name;
+    student.nationality = signinReq.userData.nationality;
+    student.email = signinReq.userData.email;
+    student.password = signinReq.userData.password;
+    student.education = signinReq.userData.education;
+    student.major = signinReq.userData.major;
+    student.visa = signinReq.userData.visa;
+    student.topikLevel = signinReq.userData.topik;
+    student.tags = signinReq.userData.interestTags;
+    await this.studentsRepository.save(student);
+
+    return new SigninResponse(student);
   }
 
-  async getJobs() {
+  async getJobs(userData: JobRequest) {
     const jobs = await this.jobsRepository.find();
+
+    const predictData: PredictRequest = new PredictRequest(userData);
 
     const response: GetJobsResponse[] = [];
     for (const j of jobs) {
-      const res = new GetJobsResponse(j);
+      let prediction = await this.predict(predictData);
+      if (j.tags.includes(predictData.work) && prediction == 0) {
+        prediction = 1;
+      } else if (!j.tags.includes(predictData.work) && prediction == 1) {
+        prediction = 0;
+      }
+      const res = new GetJobsResponse(j, prediction);
       response.push(res);
     }
     return response;
+  }
+
+  async predict(userData: PredictRequest) {
+    const response = await fetch('http://localhost:8000/predict', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      throw new HttpException('predict error', HttpStatus.BAD_REQUEST);
+    }
+
+    const data = await response.json();
+
+    return data.prediction;
   }
 }

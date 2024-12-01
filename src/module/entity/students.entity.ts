@@ -41,6 +41,6 @@ export class Students {
   @Column({ type: 'varchar', length: 30, nullable: false })
   topikLevel: string;
 
-  @Column({ type: 'varchar', array: true })
-  tags: string[]; // 관심 태그
+  @Column({ type: 'varchar' })
+  tags: string; // 관심 태그
 }

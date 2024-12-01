@@ -8,8 +8,9 @@ export class GetJobsResponse {
   readonly endAt: Date;
   readonly imgSrc: string;
   readonly jobDetail: string;
+  readonly likelihood: number;
 
-  constructor(job: Jobs) {
+  constructor(job: Jobs, prediction: number) {
     this.id = job.id;
     this.companyName = job.companyName;
     this.title = job.title;
@@ -17,5 +18,6 @@ export class GetJobsResponse {
     this.endAt = job.endAt;
     this.imgSrc = job.imgSrc;
     this.jobDetail = job.jobDetail;
+    this.likelihood = prediction;
   }
 }
