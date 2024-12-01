@@ -13,7 +13,7 @@ export class Response<T> {
     this.data = data;
   }
 
-  static of<T>(status: HttpStatus, data?: T): Response<T> {
-    return new Response<T>(status, null, data);
+  static of<T>(status: HttpStatus, message: string, data?: T): Response<T> {
+    return new Response<T>(status, message, data);
   }
 }
