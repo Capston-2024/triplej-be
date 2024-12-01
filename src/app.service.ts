@@ -5,6 +5,7 @@ import { JobsRepository } from './module/repository/jobs.repository';
 import { Students } from './module/entity/students.entity';
 import { StudentsRepository } from './module/repository/students.repository';
 import { SigninRequest } from './module/dto/signin.dto';
+import { GetJobsResponse } from './module/dto/get_jobs.dto';
 
 @Injectable()
 export class AppService {
@@ -16,10 +17,27 @@ export class AppService {
   ) {}
 
   async signIn(signinReq: SigninRequest) {
-    return 'signin';
+    const student = new Students();
+    student.name = signinReq.name;
+    student.nationality = signinReq.nationality;
+    student.email = signinReq.email;
+    student.password = signinReq.password;
+    student.education = signinReq.education;
+    student.major = signinReq.major;
+    student.visa = signinReq.visa;
+    student.topikLevel = signinReq.topikLevel;
+    student.tags = signinReq.tags;
+    return await this.studentsRepository.save(student);
   }
 
   async getJobs() {
-    return 'get jobs';
+    const jobs = await this.jobsRepository.find();
+
+    const response: GetJobsResponse[] = [];
+    for (const j of jobs) {
+      const res = new GetJobsResponse(j);
+      response.push(res);
+    }
+    return response;
   }
 }
