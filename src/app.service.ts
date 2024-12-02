@@ -7,6 +7,7 @@ import { StudentsRepository } from './module/repository/students.repository';
 import { SigninRequest, SigninResponse } from './module/dto/signin.dto';
 import { GetJobsResponse } from './module/dto/get_jobs.dto';
 import { JobRequest, PredictRequest } from './module/dto/predict.dto';
+import { JobDto } from './module/dto/add_job.dto';
 
 @Injectable()
 export class AppService {
@@ -68,5 +69,16 @@ export class AppService {
     const data = await response.json();
 
     return data.prediction;
+  }
+
+  async addJob(jobData: JobDto) {
+    const job = new Jobs();
+    job.companyName = jobData.companyName;
+    job.title = jobData.title;
+    job.tags = jobData.tags;
+    job.endAt = jobData.endAt;
+    job.imgSrc = jobData.imgSrc;
+    job.jobDetail = jobData.jobDetail;
+    await this.jobsRepository.save(job);
   }
 }

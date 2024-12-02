@@ -9,6 +9,7 @@ import { AppService } from './app.service';
 import { SigninRequest } from './module/dto/signin.dto';
 import { Response } from './common/response';
 import { JobRequest } from './module/dto/predict.dto';
+import { JobDto } from './module/dto/add_job.dto';
 
 @Controller()
 export class AppController {
@@ -30,5 +31,10 @@ export class AppController {
       '채용 공고 목록 조회가 완료되었습니다.',
       await this.appService.getJobs(userData),
     );
+  }
+
+  @Post('/job')
+  async addJob(@Body(ValidationPipe) jobData: JobDto) {
+    return await this.appService.addJob(jobData);
   }
 }
