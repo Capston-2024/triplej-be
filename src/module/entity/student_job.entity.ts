@@ -4,7 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -37,15 +37,15 @@ export class StudentJob {
   @Column({ type: 'boolean', nullable: false })
   like: boolean;
 
-  @OneToMany(() => Score, (scores) => scores.studentJob)
-  scores: Score[];
+  @OneToOne(() => Score, (score) => score.studentJob)
+  score: Score;
 
-  @OneToMany(() => Letter, (letters) => letters.studentJob)
-  letters: Letter[];
+  @OneToOne(() => Letter, (letter) => letter.studentJob)
+  letter: Letter;
 
-  @OneToMany(() => Resume, (resumes) => resumes.studentJob)
-  resumes: Resume[];
+  @OneToOne(() => Resume, (resume) => resume.studentJob)
+  resume: Resume;
 
-  @OneToMany(() => Portfolio, (portfolios) => portfolios.studentJob)
-  portfolios: Portfolio[];
+  @OneToOne(() => Portfolio, (portfolio) => portfolio.studentJob)
+  portfolio: Portfolio;
 }

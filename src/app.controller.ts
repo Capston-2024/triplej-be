@@ -1,5 +1,15 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  ValidationPipe,
+} from '@nestjs/common';
 import { AppService } from './app.service';
+import { ApiOperation } from '@nestjs/swagger';
+import { ApplyJobRequest } from './module/dto/apply_job.dto';
+import { Response } from './common/response';
 
 @Controller()
 export class AppController {
@@ -16,8 +26,13 @@ export class AppController {
   }
 
   @Post('/job-apply')
-  async applyJob() {
-    // 지원하기 API
+  @ApiOperation({ summary: '지원하기' })
+  async applyJob(@Body(ValidationPipe) applyJobReq: ApplyJobRequest) {
+    return Response.of(
+      HttpStatus.OK,
+      '지원이 완료되었습니다.',
+      await this.appService.applyJob(applyJobReq),
+    );
   }
 
   @Get('/user-info')
