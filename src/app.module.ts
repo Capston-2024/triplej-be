@@ -7,6 +7,11 @@ import { Student } from './module/entity/student.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as process from 'process';
 import { Company } from './module/entity/company.entity';
+import { Letter } from './module/entity/letter.entity';
+import { Portfolio } from './module/entity/portfolio.entity';
+import { Resume } from './module/entity/resume.entity';
+import { Score } from './module/entity/score.entity';
+import { StudentJob } from './module/entity/student_job.entity';
 
 @Module({
   imports: [
@@ -16,11 +21,29 @@ import { Company } from './module/entity/company.entity';
       port: 5432,
       username: process.env.DB_USERNAME,
       database: 'triplej',
-      entities: [Job, Student, Company],
+      entities: [
+        Company,
+        Job,
+        Letter,
+        Portfolio,
+        Resume,
+        Score,
+        Student,
+        StudentJob,
+      ],
       synchronize: false,
       namingStrategy: new SnakeNamingStrategy(),
     }),
-    TypeOrmModule.forFeature([Job, Student, Company]),
+    TypeOrmModule.forFeature([
+      Company,
+      Job,
+      Letter,
+      Portfolio,
+      Resume,
+      Score,
+      Student,
+      StudentJob,
+    ]),
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -7,14 +7,34 @@ import { StudentRepository } from './module/repository/student.repository';
 import { SigninRequest } from './module/dto/signin.dto';
 import { JobRequest, PredictRequest } from './module/dto/predict.dto';
 import { JobDto } from './module/dto/add_job.dto';
+import { Company } from './module/entity/company.entity';
+import { CompanyRepository } from './module/repository/company.repository';
+import { Letter } from './module/entity/letter.entity';
+import { LetterRepository } from './module/repository/letter.repository';
+import { Portfolio } from './module/entity/portfolio.entity';
+import { PortfolioRepository } from './module/repository/portfolio.repository';
+import { Resume } from './module/entity/resume.entity';
+import { ResumeRepository } from './module/repository/resume.repository';
+import { Score } from './module/entity/score.entity';
+import { ScoreRepository } from './module/repository/score.repository';
+import { StudentJob } from './module/entity/student_job.entity';
+import { StudentJobRepository } from './module/repository/student_job.repository';
 
 @Injectable()
 export class AppService {
   constructor(
+    @InjectRepository(Company) private companyRepository: CompanyRepository,
     @InjectRepository(Job)
     private jobsRepository: JobRepository,
+    @InjectRepository(Letter) private letterRepository: LetterRepository,
+    @InjectRepository(Portfolio)
+    private portfolioRepository: PortfolioRepository,
+    @InjectRepository(Resume) private resumeRepository: ResumeRepository,
+    @InjectRepository(Score) private scoreRepository: ScoreRepository,
     @InjectRepository(Student)
     private studentsRepository: StudentRepository,
+    @InjectRepository(StudentJob)
+    private studentJobRepository: StudentJobRepository,
   ) {}
 
   async signIn(signinReq: SigninRequest) {
