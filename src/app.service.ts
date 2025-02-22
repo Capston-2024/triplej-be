@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Job } from './module/entity/job.entity';
-import { JobsRepository } from './module/repository/jobs.repository';
+import { JobRepository } from './module/repository/job.repository';
 import { Student } from './module/entity/student.entity';
-import { StudentsRepository } from './module/repository/students.repository';
+import { StudentRepository } from './module/repository/student.repository';
 import { SigninRequest } from './module/dto/signin.dto';
 import { JobRequest, PredictRequest } from './module/dto/predict.dto';
 import { JobDto } from './module/dto/add_job.dto';
@@ -12,9 +12,9 @@ import { JobDto } from './module/dto/add_job.dto';
 export class AppService {
   constructor(
     @InjectRepository(Job)
-    private jobsRepository: JobsRepository,
+    private jobsRepository: JobRepository,
     @InjectRepository(Student)
-    private studentsRepository: StudentsRepository,
+    private studentsRepository: StudentRepository,
   ) {}
 
   async signIn(signinReq: SigninRequest) {
