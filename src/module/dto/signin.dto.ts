@@ -1,4 +1,4 @@
-import { Students } from '../entity/students.entity';
+import { Student } from '../entity/student.entity';
 
 export class UserData {
   readonly name: string;
@@ -23,12 +23,14 @@ export class SigninResponse {
   readonly topik: string;
   readonly work: string;
 
-  constructor(student: Students) {
+  constructor(student: Student) {
+    /*
     this.name = student.name;
     this.email = student.email;
     this.nationality = student.nationality;
     this.education = student.education;
     this.topik = student.topikLevel;
     this.work = student.tags;
+     */
   }
 }
