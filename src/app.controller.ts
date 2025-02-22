@@ -40,9 +40,13 @@ export class AppController {
   }
 
   @Post('/jobs/:jobId/like')
-  @ApiOperation({ summary: '관심 공고 지정하기' })
-  async likeJob(@Param('jobId') jobId: number) {
-    // todo - 관심공고 지정하기 API
+  @ApiOperation({ summary: '관심 공고 지정/지정해제 하기' })
+  async likeJob(@Param('jobId') jobId: number, @Query('email') email: string) {
+    return Response.of(
+      HttpStatus.OK,
+      '관심 공고 지정/지정해제 되었습니다.',
+      await this.appService.likeJob(jobId, email),
+    );
   }
 
   @Get('/user-info')

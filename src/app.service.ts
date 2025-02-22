@@ -194,6 +194,42 @@ export class AppService {
     });
   }
 
+  async likeJob(jobId: number, email: string) {
+    // Check Student
+    const student = await this.studentsRepository.findOneBy({
+      email: email,
+    });
+    if (!student) {
+      return Response.error(
+        HttpStatus.BAD_REQUEST,
+        '잘못된 유학생 정보입니다.',
+      );
+    }
+
+    // Check Job
+    const job = await this.jobsRepository.findOneBy({ id: jobId });
+    if (!job) {
+      return Response.error(HttpStatus.BAD_REQUEST, '잘못된 공고 정보입니다.');
+    }
+
+    // Like or Unlike
+    return await this.entityManager.transaction(async (manager) => {
+      // Check StudentJob Data
+      const studentJob = await this.studentJobRepository.findOne({
+        where: {
+          student: student,
+          job: job,
+        },
+      });
+
+      await manager.update(
+        StudentJob,
+        { id: studentJob.id },
+        { like: !studentJob.like },
+      );
+    });
+  }
+
   async getUserInfo() {
     // 회원정보 조회 API
   }
