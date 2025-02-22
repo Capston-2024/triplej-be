@@ -18,19 +18,28 @@ export class Students {
   updatedAt: Date;
 
   @Column({ type: 'varchar', length: 30, nullable: false })
-  name: string;
+  firstName: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: false })
+  lastName: string;
 
   @Column({ type: 'varchar', length: 30, nullable: false })
   nationality: string;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 30, nullable: false })
+  language: string;
+
+  @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   email: string;
 
   @Column({ type: 'varchar', length: 30, nullable: false })
   password: string;
 
   @Column({ type: 'varchar', length: 10, nullable: false })
-  education: string;
+  degree: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: false })
+  college: string;
 
   @Column({ type: 'varchar', length: 50, nullable: false })
   major: string;
@@ -39,8 +48,5 @@ export class Students {
   visa: string;
 
   @Column({ type: 'varchar', length: 30, nullable: false })
-  topikLevel: string;
-
-  @Column({ type: 'varchar' })
-  tags: string; // 관심 태그
+  topik: string;
 }
