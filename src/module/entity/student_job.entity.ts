@@ -4,11 +4,13 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Student } from './student.entity';
 import { Job } from './job.entity';
+import { Score } from './score.entity';
 
 @Entity()
 export class StudentJob {
@@ -31,4 +33,7 @@ export class StudentJob {
 
   @Column({ type: 'boolean', nullable: false })
   like: boolean;
+
+  @OneToMany(() => Score, (scores) => scores.studentJob)
+  scores: Score[];
 }
