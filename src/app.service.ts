@@ -19,6 +19,8 @@ import { StudentJobRepository } from './module/repository/student_job.repository
 import { ApplyJobRequest } from './module/dto/apply_job.dto';
 import { Response } from './common/response';
 import { EntityManager } from 'typeorm';
+import { ApplyStatus } from './module/enums/apply_status';
+import { GetApplicationStatusListResponse } from './module/dto/get_application_status_list.dto';
 
 @Injectable()
 export class AppService {
@@ -97,6 +99,7 @@ export class AppService {
         newStudentJob.student = student;
         newStudentJob.job = job;
         newStudentJob.like = false;
+        newStudentJob.status = ApplyStatus.APPLIED;
         const savedStudentJob = await manager.save(StudentJob, newStudentJob);
 
         // Add Letter with Match
@@ -123,6 +126,13 @@ export class AppService {
           await manager.save(Portfolio, newPortfolio);
         }
       } else {
+        // Update StudentJob Data
+        await manager.update(
+          StudentJob,
+          { id: studentJob.id },
+          { status: ApplyStatus.APPLIED },
+        );
+
         // Update Letter with Match
         await manager.update(
           Letter,
@@ -187,8 +197,25 @@ export class AppService {
     // 회원정보 조회 API
   }
 
-  async getApplicationStatusList() {
-    // 지원현황 조회 API
+  async getApplicationStatusList(email: string) {
+    // Check Student
+    const student = await this.studentsRepository.findOneBy({
+      email: email,
+    });
+    if (!student) {
+      return Response.error(
+        HttpStatus.BAD_REQUEST,
+        '잘못된 유학생 정보입니다.',
+      );
+    }
+
+    // Find Student's StudentJob Data
+    const result = await this.studentJobRepository.find({
+      where: { student: student },
+      relations: ['job', 'job.company'],
+    });
+
+    return new GetApplicationStatusListResponse(result);
   }
 
   async getJobPostingList() {

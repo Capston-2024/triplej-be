@@ -3,13 +3,16 @@ import {
   Controller,
   Get,
   HttpStatus,
+  Param,
   Post,
+  Query,
   ValidationPipe,
 } from '@nestjs/common';
 import { AppService } from './app.service';
-import { ApiOperation } from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { ApplyJobRequest } from './module/dto/apply_job.dto';
 import { Response } from './common/response';
+import { GetApplicationStatusListResponse } from './module/dto/get_application_status_list.dto';
 
 @Controller()
 export class AppController {
@@ -35,14 +38,26 @@ export class AppController {
     );
   }
 
+  @Post('/jobs/:jobId/like')
+  @ApiOperation({ summary: '관심 공고 지정하기' })
+  async likeJob(@Param('jobId') jobId: number) {
+    // todo - 관심공고 지정하기 API
+  }
+
   @Get('/user-info')
   async getUserInfo() {
     // 회원정보 조회 API
   }
 
   @Get('/application-status-list')
-  async getApplicationStatusList() {
-    // 지원현황 조회 API
+  @ApiOperation({ summary: '지원 현황 조회하기' })
+  @ApiOkResponse({ type: GetApplicationStatusListResponse })
+  async getApplicationStatusList(@Query('email') email: string) {
+    return Response.of(
+      HttpStatus.OK,
+      '지원 현황이 조회되었습니다.',
+      await this.appService.getApplicationStatusList(email),
+    );
   }
 
   @Get('/job-posting-list')

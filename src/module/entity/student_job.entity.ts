@@ -14,6 +14,7 @@ import { Score } from './score.entity';
 import { Letter } from './letter.entity';
 import { Resume } from './resume.entity';
 import { Portfolio } from './portfolio.entity';
+import { ApplyStatus } from '../enums/apply_status';
 
 @Entity()
 export class StudentJob {
@@ -36,6 +37,9 @@ export class StudentJob {
 
   @Column({ type: 'boolean', nullable: false })
   like: boolean;
+
+  @Column({ type: 'enum', enum: ApplyStatus, default: ApplyStatus.NONE })
+  status: ApplyStatus;
 
   @OneToOne(() => Score, (score) => score.studentJob)
   score: Score;
