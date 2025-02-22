@@ -2,9 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Companies } from './companies.entity';
 
 @Entity()
 export class Jobs {
@@ -17,21 +20,28 @@ export class Jobs {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type: 'varchar', length: 30, nullable: false })
-  companyName: string;
+  @ManyToOne(() => Companies, (company) => company.jobs)
+  @JoinColumn({ name: 'company_id' })
+  company: Companies;
 
-  @Column({ type: 'varchar', length: 50, nullable: false })
+  @Column({ type: 'varchar', length: 100, nullable: false })
   title: string;
 
   @Column({ type: 'varchar', array: true })
-  tags: string[];
+  works: string[];
 
-  @Column({ type: 'timestamp', nullable: true })
-  endAt: Date;
+  @Column({ type: 'varchar', array: true })
+  employments: string[];
 
-  @Column({ type: 'varchar', length: 100, nullable: true })
-  imgSrc: string; // 회사 이미지 파일
+  @Column({ type: 'varchar', array: true })
+  languages: string[];
 
-  @Column({ type: 'varchar', length: 100, nullable: false })
-  jobDetail: string; // 공고 링크
+  @Column({ type: 'varchar', array: true })
+  visas: string[];
+
+  @Column({ type: 'varchar', length: 500, nullable: false })
+  jobInfo: string;
+
+  @Column({ type: 'varchar', array: true })
+  preferences: string[];
 }

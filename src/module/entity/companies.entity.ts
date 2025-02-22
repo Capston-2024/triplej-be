@@ -2,9 +2,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { Jobs } from './jobs.entity';
 
 @Entity()
 export class Companies {
@@ -29,7 +31,7 @@ export class Companies {
   @Column({ type: 'varchar', length: 30, nullable: false })
   password: string;
 
-  @Column({ type: 'array', nullable: false })
+  @Column({ type: 'varchar', array: true })
   tags: string[];
 
   @Column({ type: 'varchar', length: 50, nullable: false })
@@ -37,4 +39,7 @@ export class Companies {
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   companyInfo: string;
+
+  @OneToMany(() => Jobs, (jobs) => jobs.company)
+  jobs: Jobs[];
 }
