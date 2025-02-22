@@ -21,6 +21,7 @@ import { Response } from './common/response';
 import { EntityManager } from 'typeorm';
 import { ApplyStatus } from './module/enums/apply_status';
 import { GetApplicationStatusListResponse } from './module/dto/get_application_status_list.dto';
+import { GetJobPostingListResponse } from './module/dto/get_job_posting_list.dto';
 
 @Injectable()
 export class AppService {
@@ -218,7 +219,27 @@ export class AppService {
     return new GetApplicationStatusListResponse(result);
   }
 
-  async getJobPostingList() {
-    // 전체 채용공고 조회 API & 관심공고 조회 API
+  async getJobPostingList(email: string) {
+    // Check Student
+    const student = await this.studentsRepository.findOneBy({
+      email: email,
+    });
+
+    if (!student) {
+      // Find Job Postings
+      const result = await this.studentJobRepository.find({
+        relations: ['job', 'job.company'],
+      });
+
+      return result.map((r) => new GetJobPostingListResponse(r, false));
+    } else {
+      // Find Job Postings with User Data
+      const result = await this.studentJobRepository.find({
+        where: { student: student },
+        relations: ['job', 'score', 'job.company'],
+      });
+
+      return result.map((r) => new GetJobPostingListResponse(r, true));
+    }
   }
 }
