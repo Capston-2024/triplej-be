@@ -4,7 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -14,6 +14,7 @@ import { Score } from './score.entity';
 import { Letter } from './letter.entity';
 import { Resume } from './resume.entity';
 import { Portfolio } from './portfolio.entity';
+import { ApplyStatus } from '../enums/apply_status';
 
 @Entity()
 export class StudentJob {
@@ -37,15 +38,18 @@ export class StudentJob {
   @Column({ type: 'boolean', nullable: false })
   like: boolean;
 
-  @OneToMany(() => Score, (scores) => scores.studentJob)
-  scores: Score[];
+  @Column({ type: 'enum', enum: ApplyStatus, default: ApplyStatus.NONE })
+  status: ApplyStatus;
 
-  @OneToMany(() => Letter, (letters) => letters.studentJob)
-  letters: Letter[];
+  @OneToOne(() => Score, (score) => score.studentJob)
+  score: Score;
 
-  @OneToMany(() => Resume, (resumes) => resumes.studentJob)
-  resumes: Resume[];
+  @OneToOne(() => Letter, (letter) => letter.studentJob)
+  letter: Letter;
 
-  @OneToMany(() => Portfolio, (portfolios) => portfolios.studentJob)
-  portfolios: Portfolio[];
+  @OneToOne(() => Resume, (resume) => resume.studentJob)
+  resume: Resume;
+
+  @OneToOne(() => Portfolio, (portfolio) => portfolio.studentJob)
+  portfolio: Portfolio;
 }

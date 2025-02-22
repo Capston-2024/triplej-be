@@ -3,7 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   JoinColumn,
-  ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -20,7 +20,7 @@ export class Portfolio {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => StudentJob, (studentJob) => studentJob.portfolios)
+  @OneToOne(() => StudentJob, (studentJob) => studentJob.portfolio)
   @JoinColumn({ name: 'student_job_id' })
   studentJob: StudentJob;
 
