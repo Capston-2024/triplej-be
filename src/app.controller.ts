@@ -13,6 +13,7 @@ import { ApiOkResponse, ApiOperation } from '@nestjs/swagger';
 import { ApplyJobRequest } from './module/dto/apply_job.dto';
 import { Response } from './common/response';
 import { GetApplicationStatusListResponse } from './module/dto/get_application_status_list.dto';
+import { GetJobPostingListResponse } from './module/dto/get_job_posting_list.dto';
 
 @Controller()
 export class AppController {
@@ -39,9 +40,13 @@ export class AppController {
   }
 
   @Post('/jobs/:jobId/like')
-  @ApiOperation({ summary: '관심 공고 지정하기' })
-  async likeJob(@Param('jobId') jobId: number) {
-    // todo - 관심공고 지정하기 API
+  @ApiOperation({ summary: '관심 공고 지정/지정해제 하기' })
+  async likeJob(@Param('jobId') jobId: number, @Query('email') email: string) {
+    return Response.of(
+      HttpStatus.OK,
+      '관심 공고 지정/지정해제 되었습니다.',
+      await this.appService.likeJob(jobId, email),
+    );
   }
 
   @Get('/user-info')
@@ -61,8 +66,13 @@ export class AppController {
   }
 
   @Get('/job-posting-list')
-  async getJobPostingList() {
-    // 전체 채용공고 조회 API
-    // 관심공고 조회 API 통합 - query string
+  @ApiOperation({ summary: '채용 공고 조회하기' })
+  @ApiOkResponse({ type: GetJobPostingListResponse })
+  async getJobPostingList(@Query('email') email: string) {
+    return Response.of(
+      HttpStatus.OK,
+      '채용 공고가 조회되었습니다.',
+      await this.appService.getJobPostingList(email),
+    );
   }
 }
