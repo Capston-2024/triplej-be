@@ -7,10 +7,10 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Companies } from './companies.entity';
+import { Company } from './company.entity';
 
 @Entity()
-export class Jobs {
+export class Job {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -20,9 +20,9 @@ export class Jobs {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @ManyToOne(() => Companies, (company) => company.jobs)
+  @ManyToOne(() => Company, (company) => company.jobs)
   @JoinColumn({ name: 'company_id' })
-  company: Companies;
+  company: Company;
 
   @Column({ type: 'varchar', length: 100, nullable: false })
   title: string;

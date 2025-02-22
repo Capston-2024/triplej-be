@@ -1,4 +1,4 @@
 import { Repository } from 'typeorm';
-import { Students } from '../entity/students.entity';
+import { Student } from '../entity/student.entity';
 
-export class StudentsRepository extends Repository<Students> {}
+export class StudentsRepository extends Repository<Student> {}

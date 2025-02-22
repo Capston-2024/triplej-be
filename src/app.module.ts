@@ -2,10 +2,11 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Jobs } from './module/entity/jobs.entity';
-import { Students } from './module/entity/students.entity';
+import { Job } from './module/entity/job.entity';
+import { Student } from './module/entity/student.entity';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import * as process from 'process';
+import { Company } from './module/entity/company.entity';
 
 @Module({
   imports: [
@@ -15,11 +16,11 @@ import * as process from 'process';
       port: 5432,
       username: process.env.DB_USERNAME,
       database: 'triplej',
-      entities: [Jobs, Students],
+      entities: [Job, Student, Company],
       synchronize: false,
       namingStrategy: new SnakeNamingStrategy(),
     }),
-    TypeOrmModule.forFeature([Jobs, Students]),
+    TypeOrmModule.forFeature([Job, Student, Company]),
   ],
   controllers: [AppController],
   providers: [AppService],

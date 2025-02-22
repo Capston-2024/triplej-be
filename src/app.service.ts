@@ -1,25 +1,25 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Jobs } from './module/entity/jobs.entity';
+import { Job } from './module/entity/job.entity';
 import { JobsRepository } from './module/repository/jobs.repository';
-import { Students } from './module/entity/students.entity';
+import { Student } from './module/entity/student.entity';
 import { StudentsRepository } from './module/repository/students.repository';
-import { SigninRequest, SigninResponse } from './module/dto/signin.dto';
-import { GetJobsResponse } from './module/dto/get_jobs.dto';
+import { SigninRequest } from './module/dto/signin.dto';
 import { JobRequest, PredictRequest } from './module/dto/predict.dto';
 import { JobDto } from './module/dto/add_job.dto';
 
 @Injectable()
 export class AppService {
   constructor(
-    @InjectRepository(Jobs)
+    @InjectRepository(Job)
     private jobsRepository: JobsRepository,
-    @InjectRepository(Students)
+    @InjectRepository(Student)
     private studentsRepository: StudentsRepository,
   ) {}
 
   async signIn(signinReq: SigninRequest) {
-    const student = new Students();
+    /*
+    const student = new Student();
     student.name = signinReq.userData.name;
     student.nationality = signinReq.userData.nationality;
     student.email = signinReq.userData.email;
@@ -32,9 +32,11 @@ export class AppService {
     await this.studentsRepository.save(student);
 
     return new SigninResponse(student);
+     */
   }
 
   async getJobs(userData: JobRequest) {
+    /*
     const jobs = await this.jobsRepository.find();
 
     const predictData: PredictRequest = new PredictRequest(userData);
@@ -51,6 +53,7 @@ export class AppService {
       response.push(res);
     }
     return response;
+     */
   }
 
   async predict(userData: PredictRequest) {
@@ -72,6 +75,7 @@ export class AppService {
   }
 
   async addJob(jobData: JobDto) {
+    /*
     const job = new Jobs();
     job.companyName = jobData.companyName;
     job.title = jobData.title;
@@ -80,5 +84,6 @@ export class AppService {
     job.imgSrc = jobData.imgSrc;
     job.jobDetail = jobData.jobDetail;
     await this.jobsRepository.save(job);
+     */
   }
 }

@@ -2,14 +2,12 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Jobs } from './jobs.entity';
 
 @Entity()
-export class Companies {
+export class Student {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -20,10 +18,16 @@ export class Companies {
   updatedAt: Date;
 
   @Column({ type: 'varchar', length: 30, nullable: false })
-  companyName: string;
+  firstName: string;
 
   @Column({ type: 'varchar', length: 30, nullable: false })
-  workerName: string;
+  lastName: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: false })
+  nationality: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: false })
+  language: string;
 
   @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   email: string;
@@ -31,15 +35,18 @@ export class Companies {
   @Column({ type: 'varchar', length: 30, nullable: false })
   password: string;
 
-  @Column({ type: 'varchar', array: true })
-  tags: string[];
+  @Column({ type: 'varchar', length: 10, nullable: false })
+  degree: string;
+
+  @Column({ type: 'varchar', length: 30, nullable: false })
+  college: string;
 
   @Column({ type: 'varchar', length: 50, nullable: false })
-  companyImage: string;
+  major: string;
 
-  @Column({ type: 'varchar', length: 100, nullable: false })
-  companyInfo: string;
+  @Column({ type: 'varchar', length: 30, nullable: false })
+  visa: string;
 
-  @OneToMany(() => Jobs, (jobs) => jobs.company)
-  jobs: Jobs[];
+  @Column({ type: 'varchar', length: 30, nullable: false })
+  topik: string;
 }

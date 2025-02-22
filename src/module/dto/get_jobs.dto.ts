@@ -1,4 +1,4 @@
-import { Jobs } from '../entity/jobs.entity';
+import { Job } from '../entity/job.entity';
 
 export class GetJobsResponse {
   readonly id: number;
@@ -10,7 +10,8 @@ export class GetJobsResponse {
   readonly jobDetail: string;
   readonly likelihood: number;
 
-  constructor(job: Jobs, prediction: number) {
+  constructor(job: Job, prediction: number) {
+    /*
     this.id = job.id;
     this.companyName = job.companyName;
     this.title = job.title;
@@ -19,5 +20,6 @@ export class GetJobsResponse {
     this.imgSrc = job.imgSrc;
     this.jobDetail = job.jobDetail;
     this.likelihood = prediction;
+     */
   }
 }
