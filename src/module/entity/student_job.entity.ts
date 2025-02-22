@@ -11,6 +11,7 @@ import {
 import { Student } from './student.entity';
 import { Job } from './job.entity';
 import { Score } from './score.entity';
+import { Letter } from './letter.entity';
 
 @Entity()
 export class StudentJob {
@@ -36,4 +37,7 @@ export class StudentJob {
 
   @OneToMany(() => Score, (scores) => scores.studentJob)
   scores: Score[];
+
+  @OneToMany(() => Letter, (letters) => letters.studentJob)
+  letters: Letter[];
 }
