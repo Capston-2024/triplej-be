@@ -14,19 +14,31 @@ import { ApplyJobRequest } from './module/dto/apply_job.dto';
 import { Response } from './common/response';
 import { GetApplicationStatusListResponse } from './module/dto/get_application_status_list.dto';
 import { GetJobPostingListResponse } from './module/dto/get_job_posting_list.dto';
+import { GetUserInfoResponse } from './module/dto/get_user_auth_info.dto';
+import { LoginRequest } from './module/dto/login.dto';
+import { SignUpRequest } from './module/dto/sing_up.dto';
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Post('/login')
-  async login() {
-    // 로그인 API
+  @ApiOperation({ summary: '로그인하기' })
+  async login(@Body(ValidationPipe) loginReq: LoginRequest) {
+    return Response.of(
+      HttpStatus.OK,
+      '로그인에 성공하였습니다.',
+      await this.appService.login(loginReq),
+    );
   }
 
   @Post('/sign-up')
-  async signUp() {
-    // 회원가입 API
+  async signUp(@Body(ValidationPipe) signUpReq: SignUpRequest) {
+    return Response.of(
+      HttpStatus.OK,
+      '회원가입에 성공하였습니다.',
+      await this.appService.signUp(signUpReq),
+    );
   }
 
   @Post('/job-apply')
@@ -50,8 +62,14 @@ export class AppController {
   }
 
   @Get('/user-info')
-  async getUserInfo() {
-    // 회원정보 조회 API
+  @ApiOperation({ summary: '회원 정보 조회하기' })
+  @ApiOkResponse({ type: GetUserInfoResponse })
+  async getUserInfo(@Query('email') email: string) {
+    return Response.of(
+      HttpStatus.OK,
+      '회원 정보가 조회되었습니다.',
+      await this.appService.getUserInfo(email),
+    );
   }
 
   @Get('/application-status-list')

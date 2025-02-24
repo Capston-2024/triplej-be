@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -8,6 +9,18 @@ async function bootstrap() {
     methods: 'GET,HEAD,POST,PUT,PATCH,DELETE,OPTIONS',
     credentials: true, // 인증 정보 포함 (쿠키 등)
   });
+
+  //Swagger 설정
+  const config = new DocumentBuilder()
+    .setTitle('API 문서') // 문서 제목
+    .setDescription('API 설명') // 설명
+    .setVersion('1.0') // 버전
+    .addTag('Auth') // 태그
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api-docs', app, document);
+
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
