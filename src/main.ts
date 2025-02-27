@@ -12,8 +12,8 @@ async function bootstrap() {
 
   //Swagger 설정
   const config = new DocumentBuilder()
-    .setTitle('API 문서') // 문서 제목
-    .setDescription('API 설명') // 설명
+    .setTitle('Pickin\' API') // 문서 제목
+    .setDescription('Pickin\' API Description') // 설명
     .setVersion('1.0') // 버전
     .addTag('Auth') // 태그
     .build();
