@@ -3,16 +3,32 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ApplyStatus } from '../enums/apply_status';
 
 export class ApplicationStats {
-  @ApiProperty()
+  @ApiProperty({
+    example: 0,
+    description: '회원의 총 지원 완료 공고 수',
+    required: true,
+  })
   readonly applied: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 1,
+    description: '회원의 총 채용 진행 중 공고 수',
+    required: true,
+  })
   readonly inProgress: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 2,
+    description: '회원의 최종 합격 공고 수',
+    required: true,
+  })
   readonly hired: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: 2,
+    description: '회원의 불합격 공고 수',
+    required: true,
+  })
   readonly rejected: number;
 
   constructor(results: StudentJob[]) {
@@ -30,16 +46,32 @@ export class ApplicationStats {
 }
 
 export class Application {
-  @ApiProperty()
+  @ApiProperty({
+    example: 3,
+    description: '공고 ID',
+    required: true,
+  })
   readonly jobId: number;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '카카오스타일',
+    description: '해당 공고에 대한 회사명',
+    required: true,
+  })
   readonly companyName: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '인도네시아 콘텐츠 로컬라이징 & 사업개발 매니저',
+    description: '공고 제목',
+    required: true,
+  })
   readonly title: string;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: '검토 중',
+    description: '해당 공고의 진행 상태',
+    required: true,
+  })
   readonly status: string;
 
   constructor(result: StudentJob) {
@@ -51,10 +83,30 @@ export class Application {
 }
 
 export class GetApplicationStatusListResponse {
-  @ApiProperty()
+  @ApiProperty({
+    example: {
+      applied: 0,
+      inProgress: 1,
+      hired: 2,
+      rejected: 1,
+    },
+    description: '회원의 공고 지원 상태',
+    required: true,
+  })
   readonly applicationStats: ApplicationStats;
 
-  @ApiProperty()
+  @ApiProperty({
+    example: [
+      {
+        jobId: 3,
+        companyName: '카카오스타일',
+        title: '인도네시아 콘텐츠 로컬라이징 & 사업개발 매니저',
+        status: '검토 중',
+      },
+    ],
+    description: '회원의 지원 공고 정보',
+    required: true,
+  })
   readonly applicationList: Application[];
   constructor(result: StudentJob[]) {
     this.applicationStats = new ApplicationStats(result);

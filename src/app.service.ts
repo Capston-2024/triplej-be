@@ -22,6 +22,10 @@ import { EntityManager } from 'typeorm';
 import { ApplyStatus } from './module/enums/apply_status';
 import { GetApplicationStatusListResponse } from './module/dto/get_application_status_list.dto';
 import { GetJobPostingListResponse } from './module/dto/get_job_posting_list.dto';
+import { GetUserInfoResponse } from './module/dto/get_user_auth_info.dto';
+import { LoginRequest } from './module/dto/login.dto';
+import * as bcrypt from 'bcryptjs';
+import { SignUpRequest } from './module/dto/sing_up.dto';
 
 @Injectable()
 export class AppService {
@@ -41,12 +45,66 @@ export class AppService {
     private studentJobRepository: StudentJobRepository,
   ) {}
 
-  async login() {
-    // 로그인 API
+  async hashPassword(password: string): Promise<string> {
+    const salt = await bcrypt.genSalt(10); // create salt
+    return bcrypt.hash(password, salt);
   }
 
-  async signUp() {
-    // 회원가입 API
+  async comparePassword(
+    password: string,
+    hashedPassword: string,
+  ): Promise<boolean> {
+    return bcrypt.compare(password, hashedPassword);
+  }
+
+  async login(loginReq: LoginRequest) {
+    //Check Student
+    const student = await this.studentsRepository.findOneBy({
+      email: loginReq.email,
+    });
+    if (!student) {
+      return Response.error(
+        HttpStatus.BAD_REQUEST,
+        '잘못된 유학생 정보입니다.',
+      );
+    }
+
+    //Check Password
+    if (await this.comparePassword(loginReq.password, student.password)) {
+      return true;
+    } else {
+      return Response.error(HttpStatus.BAD_REQUEST, '잘못된 비밀번호입니다.');
+    }
+  }
+
+  async signUp(signUpReq: SignUpRequest) {
+    //Check Email Unique
+    const student = await this.studentsRepository.findOneBy({
+      email: signUpReq.email,
+    });
+    if (student) {
+      return Response.error(
+        HttpStatus.BAD_REQUEST,
+        '이미 존재하는 유학생 정보입니다.',
+      );
+    }
+
+    //Add Student Data
+    return await this.entityManager.transaction(async (manager) => {
+      const newStudent = new Student();
+      newStudent.email = signUpReq.email;
+      newStudent.password = await this.hashPassword(signUpReq.password);
+      newStudent.firstName = signUpReq.firstName;
+      newStudent.lastName = signUpReq.lastName;
+      newStudent.nationality = signUpReq.nationality;
+      newStudent.language = signUpReq.language;
+      newStudent.degree = signUpReq.degree;
+      newStudent.college = signUpReq.college;
+      newStudent.major = signUpReq.major;
+      newStudent.visa = signUpReq.visa;
+      newStudent.topik = signUpReq.topik;
+      await manager.save(Student, newStudent);
+    });
   }
 
   async calcPickinScore() {
@@ -230,8 +288,19 @@ export class AppService {
     });
   }
 
-  async getUserInfo() {
-    // 회원정보 조회 API
+  async getUserInfo(email: string) {
+    // Check Student
+    const student = await this.studentsRepository.findOneBy({
+      email: email,
+    });
+    if (!student) {
+      return Response.error(
+        HttpStatus.BAD_REQUEST,
+        '잘못된 유학생 정보입니다.',
+      );
+    }
+
+    return new GetUserInfoResponse(student);
   }
 
   async getApplicationStatusList(email: string) {

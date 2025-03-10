@@ -7,7 +7,7 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class Student {
+  export class Student {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -32,7 +32,7 @@ export class Student {
   @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
   email: string;
 
-  @Column({ type: 'varchar', length: 30, nullable: false })
+  @Column({ type: 'varchar', length: 100, nullable: false })
   password: string;
 
   @Column({ type: 'varchar', length: 10, nullable: false })
