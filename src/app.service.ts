@@ -316,10 +316,12 @@ export class AppService {
     }
 
     // Find Student's StudentJob Data
-    const result = await this.studentJobRepository.find({
-      where: { student: student },
-      relations: ['job', 'job.company'],
-    });
+    const result = await this.studentJobRepository
+      .createQueryBuilder('sj')
+      .leftJoinAndSelect('sj.job', 'jobs')
+      .leftJoinAndSelect('jobs.company', 'companies')
+      .where('sj.student = :id', { id: student.id })
+      .getMany();
 
     return new GetApplicationStatusListResponse(result);
   }
