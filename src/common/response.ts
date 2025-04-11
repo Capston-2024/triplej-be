@@ -16,4 +16,8 @@ export class Response<T> {
   static of<T>(status: HttpStatus, message: string, data?: T): Response<T> {
     return new Response<T>(status, message, data);
   }
+
+  static error(status: HttpStatus, message: string) {
+    return new Response(status, message);
+  }
 }
