@@ -17,6 +17,7 @@ import { GetJobPostingListResponse } from './module/dto/get_job_posting_list.dto
 import { GetUserInfoResponse } from './module/dto/get_user_auth_info.dto';
 import { LoginRequest } from './module/dto/login.dto';
 import { SignUpRequest } from './module/dto/sing_up.dto';
+import { FeedbackResponse } from './module/dto/feedback.dto';
 
 @Controller()
 export class AppController {
@@ -91,6 +92,17 @@ export class AppController {
       HttpStatus.OK,
       '채용 공고가 조회되었습니다.',
       await this.appService.getJobPostingList(email),
+    );
+  }
+
+  @Get('/feedback/test')
+  @ApiOperation({ summary: '자기소개서 첨삭 - 시연' })
+  @ApiOkResponse({ type: FeedbackResponse })
+  async feedback() {
+    return Response.of(
+      HttpStatus.OK,
+      '자기소개서 첨삭 결과입니다.',
+      await this.appService.feedbackTest(),
     );
   }
 }

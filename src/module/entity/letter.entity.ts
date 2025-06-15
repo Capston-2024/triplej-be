@@ -32,4 +32,7 @@ export class Letter {
 
   @Column({ type: 'varchar', nullable: false })
   letter: string;
+
+  @Column({ type: 'varchar', array: true })
+  keywords: string[];
 }

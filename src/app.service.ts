@@ -26,11 +26,21 @@ import { GetUserInfoResponse } from './module/dto/get_user_auth_info.dto';
 import { LoginRequest } from './module/dto/login.dto';
 import * as bcrypt from 'bcryptjs';
 import { SignUpRequest } from './module/dto/sing_up.dto';
+import { Feedback } from './module/entity/feedback.entity';
+import { FeedbackRepository } from './module/repository/feedback.repository';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+import { firstValueFrom } from 'rxjs';
+import { FeedbackResponse } from './module/dto/feedback.dto';
 
 @Injectable()
 export class AppService {
+  private readonly feedbackApiUrl: string;
+
   constructor(
     private entityManager: EntityManager,
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
     @InjectRepository(Company) private companyRepository: CompanyRepository,
     @InjectRepository(Job)
     private jobsRepository: JobRepository,
@@ -43,7 +53,11 @@ export class AppService {
     private studentsRepository: StudentRepository,
     @InjectRepository(StudentJob)
     private studentJobRepository: StudentJobRepository,
-  ) {}
+    @InjectRepository(Feedback)
+    private feedbackRepository: FeedbackRepository,
+  ) {
+    this.feedbackApiUrl = this.configService.get<string>('FEEDBACK_URL');
+  }
 
   async hashPassword(password: string): Promise<string> {
     const salt = await bcrypt.genSalt(10); // create salt
@@ -348,5 +362,25 @@ export class AppService {
 
       return result.map((r) => new GetJobPostingListResponse(r, true));
     }
+  }
+
+  async feedbackTest() {
+    const target = await this.feedbackRepository.findOneBy({ id: 1 });
+    let feedbackRes = null;
+
+    // Call Feedback API
+    try {
+      feedbackRes = await firstValueFrom(
+        this.httpService.post(this.feedbackApiUrl, target),
+      );
+    } catch (err) {
+      throw new Error(err.message);
+    }
+
+    const response = new FeedbackResponse();
+    response.before = target.letter;
+    response.after = feedbackRes.data;
+
+    return response;
   }
 }

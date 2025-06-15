@@ -12,6 +12,8 @@ import { Score } from './module/entity/score.entity';
 import { StudentJob } from './module/entity/student_job.entity';
 import { databaseConfig } from './common/database.config';
 import { ConfigModule } from '@nestjs/config';
+import { Feedback } from './module/entity/feedback.entity';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
@@ -22,6 +24,7 @@ import { ConfigModule } from '@nestjs/config';
     }),
     TypeOrmModule.forFeature([
       Company,
+      Feedback,
       Job,
       Letter,
       Portfolio,
@@ -30,6 +33,7 @@ import { ConfigModule } from '@nestjs/config';
       Student,
       StudentJob,
     ]),
+    HttpModule,
   ],
   controllers: [AppController],
   providers: [AppService],
