@@ -44,4 +44,7 @@ export class Job {
 
   @Column({ type: 'varchar', array: true })
   preferences: string[];
+
+  @Column({ type: 'varchar', array: true })
+  keywords: string[];
 }
