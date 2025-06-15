@@ -31,22 +31,7 @@ $ nest build
 ### 1. set up database.config.ts
 
 ```typescript
-// database.config.ts 파일 내용을 아래 내용으로 대체하세요
-
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-
-export const databaseConfig = (): TypeOrmModuleOptions => ({
-  type: 'postgres',
-  host: 'triplej-rds.cjm2ekqqs3gt.ap-northeast-2.rds.amazonaws.com',
-  port: 5432,
-  username: 'triplej',
-  password: 'triplej2525!',
-  database: 'triplej',
-  entities: [__dirname + '/../module/entity/*.entity{.ts,.js}'],
-  synchronize: false,
-  namingStrategy: new SnakeNamingStrategy(),
-});
+// database.config.ts 파일 내용을 메일에 첨부한 내용으로 대체해주세요
 ```
 
 database 연결에 앞서, 인바운드 규칙에 접속을 위한 ip를 추가해야 합니다.
