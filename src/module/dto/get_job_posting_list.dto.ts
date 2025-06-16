@@ -50,7 +50,7 @@ export class UserInfo {
   constructor(result: StudentJob) {
     this.liked = result.like;
     this.pickinScore =
-      result.score.scoreA + result.score.scoreB + result.score.scoreC; // todo - 계산식 적용
+      result.score.pickinScore;
   }
 }
 

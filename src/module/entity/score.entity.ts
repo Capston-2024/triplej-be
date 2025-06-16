@@ -24,12 +24,6 @@ export class Score {
   @JoinColumn({ name: 'student_job_id' })
   studentJob: StudentJob;
 
-  @Column({ type: 'int', nullable: false })
-  scoreA: number;
-
-  @Column({ type: 'int', nullable: false })
-  scoreB: number;
-
-  @Column({ type: 'int', nullable: false })
-  scoreC: number;
+  @Column({ name: 'pickin_score', type: 'int', nullable: false })
+  pickinScore: number;
 }
