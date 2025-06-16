@@ -36,6 +36,7 @@ import { FeedbackResponse } from './module/dto/feedback.dto';
 @Injectable()
 export class AppService {
   private readonly feedbackApiUrl: string;
+  private readonly predictApiUrl: string;
 
   constructor(
     private entityManager: EntityManager,
@@ -57,6 +58,9 @@ export class AppService {
     private feedbackRepository: FeedbackRepository,
   ) {
     this.feedbackApiUrl = this.configService.get<string>('FEEDBACK_URL');
+    this.predictApiUrl = this.configService.get<string>(
+      'PREDICT_API_PREDICTION',
+    );
   }
 
   async hashPassword(password: string): Promise<string> {
@@ -121,13 +125,23 @@ export class AppService {
     });
   }
 
-  async calcPickinScore() {
-    // todo - pickin 지수 계산
-    return [0, 1, 2];
+  async calcPickinScore(userId: number) {
+    let predictRes = null;
+
+    // Call Feedback API
+    try {
+      predictRes = await firstValueFrom(
+        this.httpService.post(this.predictApiUrl, {
+          applicant_id: userId,
+        }),
+      );
+      return predictRes.data;
+    } catch (err) {
+      throw new Error(err.message);
+    }
   }
 
   async calcMatch(letter: string) {
-    // todo - 키워드 매칭 비율 및 의미 매칭 비율 계산
     return [0, letter.length];
   }
 
@@ -152,18 +166,17 @@ export class AppService {
     // Apply
     return await this.entityManager.transaction(async (manager) => {
       // Calculate Pickin Score & Match
-      const [scoreA, scoreB, scoreC] = await this.calcPickinScore();
       const [keywordMatch, meaningMatch] = await this.calcMatch(
         applyJobReq.letter,
       );
 
       // Check StudentJob Data
-      const studentJob = await this.studentJobRepository.findOne({
+      let studentJob = await this.studentJobRepository.findOne({
         where: {
-          student: student,
-          job: job,
+          student: { id: student.id },
+          job: { id: job.id },
         },
-        relations: ['scores, letters, resumes, portfolios'],
+        relations: ['score', 'letter', 'resume', 'portfolio'],
       });
 
       if (!studentJob) {
@@ -173,39 +186,30 @@ export class AppService {
         newStudentJob.job = job;
         newStudentJob.like = false;
         newStudentJob.status = ApplyStatus.APPLIED;
-        const savedStudentJob = await manager.save(StudentJob, newStudentJob);
-
-        // Add Letter with Match
-        const newLetter = new Letter();
-        newLetter.studentJob = savedStudentJob;
-        newLetter.keywordMatch = keywordMatch;
-        newLetter.meaningMatch = meaningMatch;
-        newLetter.letter = applyJobReq.letter;
-        await manager.save(Letter, newLetter);
-
-        if (applyJobReq.resume) {
-          // Add Resume
-          const newResume = new Resume();
-          newResume.studentJob = savedStudentJob;
-          newResume.fileLink = applyJobReq.resume;
-          await manager.save(Resume, newResume);
-        }
-
-        if (applyJobReq.portfolio) {
-          // Add Portfolio
-          const newPortfolio = new Portfolio();
-          newPortfolio.studentJob = savedStudentJob;
-          newPortfolio.fileLink = applyJobReq.portfolio;
-          await manager.save(Portfolio, newPortfolio);
-        }
+        studentJob = await manager.save(StudentJob, newStudentJob);
       } else {
-        // Update StudentJob Data
         await manager.update(
           StudentJob,
           { id: studentJob.id },
           { status: ApplyStatus.APPLIED },
         );
+      }
 
+      const letter = await this.letterRepository.findOne({
+        where: {
+          studentJob: { id: studentJob.id },
+        },
+      });
+
+      if (!letter) {
+        // Add Letter with Match
+        const newLetter = new Letter();
+        newLetter.studentJob = studentJob;
+        newLetter.keywordMatch = keywordMatch;
+        newLetter.meaningMatch = meaningMatch;
+        newLetter.letter = applyJobReq.letter;
+        await manager.save(Letter, newLetter);
+      } else {
         // Update Letter with Match
         await manager.update(
           Letter,
@@ -216,51 +220,100 @@ export class AppService {
             letter: applyJobReq.letter,
           },
         );
+      }
 
-        if (studentJob.resume) {
+      if (applyJobReq.resume) {
+        const resume = await this.resumeRepository.findOne({
+          where: {
+            studentJob: { id: studentJob.id },
+          },
+        });
+
+        if (!resume) {
+          // Add Resume
+          const newResume = new Resume();
+          newResume.studentJob = studentJob;
+          newResume.fileLink = applyJobReq.resume;
+          await manager.save(Resume, newResume);
+        } else {
           // Update Resume
           await manager.update(
             Resume,
             { studentJobId: studentJob.id },
             { fileLink: applyJobReq.resume },
           );
-        } else {
-          // Add Resume
-          const newResume = new Resume();
-          newResume.studentJob = studentJob;
-          newResume.fileLink = applyJobReq.resume;
-          await manager.save(Resume, newResume);
         }
+      }
 
-        if (studentJob.portfolio) {
+      if (applyJobReq.portfolio) {
+        const portfolio = await this.portfolioRepository.findOne({
+          where: {
+            studentJob: { id: studentJob.id },
+          },
+        });
+
+        if (!portfolio) {
+          // Add Portfolio
+          const newPortfolio = new Portfolio();
+          newPortfolio.studentJob = studentJob;
+          newPortfolio.fileLink = applyJobReq.portfolio;
+          await manager.save(Portfolio, newPortfolio);
+        } else {
           // Update Portfolio
           await manager.update(
             Portfolio,
             { studentJobId: studentJob.id },
             { fileLink: applyJobReq.portfolio },
           );
-        } else {
-          // Add Portfolio
-          const newPortfolio = new Portfolio();
-          newPortfolio.studentJob = studentJob;
-          newPortfolio.fileLink = applyJobReq.portfolio;
-          await manager.save(Portfolio, newPortfolio);
         }
       }
+    });
+  }
 
-      if (studentJob.score) {
-        // Update Score
-        await manager.update(
-          Score,
-          { studentJobId: studentJob.id },
-          { scoreA: scoreA, scoreB: scoreB, scoreC: scoreC },
-        );
-      } else {
+  async matchStudentJob(email: string) {
+    // Check Student
+    const student = await this.studentsRepository.findOneBy({
+      email: email,
+    });
+    if (!student) {
+      return Response.error(
+        HttpStatus.BAD_REQUEST,
+        '잘못된 유학생 정보입니다.',
+      );
+    }
+
+    // Apply
+    return await this.entityManager.transaction(async (manager) => {
+      // Calculate Pickin Score & Match
+      const pickinResults = await this.calcPickinScore(student.id);
+      const allJobs = await this.jobsRepository.find(); // 전체 공고 가져오기
+
+      for (const job of allJobs) {
+        const result = pickinResults.find((item) => item.채용공고id === job.id);
+        if (!result) continue; // 해당 공고에 대한 pickin 지수가 없으면 skip
+        const studentJobScore = Math.round(result.pickin지수 * 100);
+
+        // studentJob이 존재하는지 확인
+        const studentJob = await this.studentJobRepository.findOne({
+          where: {
+            student: { id: student.id },
+            job: { id: job.id },
+          },
+        });
+
+        if (studentJob) continue;
+
+        const newStudentJob = new StudentJob();
+        newStudentJob.student = student;
+        newStudentJob.job = job;
+        newStudentJob.like = false;
+        newStudentJob.status = ApplyStatus.NONE;
+        const savedStudentJob = await manager.save(StudentJob, newStudentJob);
+
         // Add Score
         const newScore = new Score();
-        newScore.scoreA = scoreA;
-        newScore.scoreB = scoreB;
-        newScore.scoreC = scoreC;
+        newScore.studentJob = savedStudentJob;
+        newScore.pickinScore = studentJobScore;
         await manager.save(Score, newScore);
       }
     });
@@ -289,8 +342,8 @@ export class AppService {
       // Check StudentJob Data
       const studentJob = await this.studentJobRepository.findOne({
         where: {
-          student: student,
-          job: job,
+          student: { id: student.id },
+          job: { id: job.id },
         },
       });
 
@@ -346,21 +399,32 @@ export class AppService {
       email: email,
     });
 
-    if (!student) {
+    if (email && student) {
+      await this.matchStudentJob(email);
       // Find Job Postings
       const result = await this.studentJobRepository.find({
-        relations: ['job', 'job.company'],
-      });
-
-      return result.map((r) => new GetJobPostingListResponse(r, false));
-    } else {
-      // Find Job Postings with User Data
-      const result = await this.studentJobRepository.find({
-        where: { student: student },
-        relations: ['job', 'score', 'job.company'],
+        where: { student: { id: student.id } },
+        relations: ['student', 'job', 'job.company', 'score'],
       });
 
       return result.map((r) => new GetJobPostingListResponse(r, true));
+    } else {
+      // Find Job Postings with User Data
+      const result = await this.studentJobRepository.find({
+        relations: ['job', 'score', 'job.company'],
+      });
+
+      const seenJobIds = new Set<number>();
+
+      const uniqueResult = result.filter((r) => {
+        if (seenJobIds.has(r.job.id)) {
+          return false; // 이미 처리한 jobId는 제외
+        }
+        seenJobIds.add(r.job.id);
+        return true;
+      });
+
+      return uniqueResult.map((r) => new GetJobPostingListResponse(r, false));
     }
   }
 
